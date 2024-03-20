@@ -1,15 +1,41 @@
-# Kotlin Multiplatform app template
+# Ballast Navigation with KSP demo project
 
-[![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-This is a basic Kotlin Multiplatform app template for Android and iOS. It includes shared business logic and data handling, and a shared UI implementation using Compose Multiplatform.
+This is a demo project to showcase using Ballast navigation in a typesafe way using KSP. 
+The app is a basic Kotlin Multiplatform app using a template generated from [KMM-Template](https://kmp.jetbrains.com/) for Android and iOS.
+It includes shared business logic and data handling, and a shared UI implementation using Compose Multiplatform.
 
-> The template is also available [with native UI written in Jetpack Compose and SwiftUI](https://github.com/kotlin/KMP-App-Template-Native).
->
-> The [`amper` branch](https://github.com/Kotlin/KMP-App-Template/tree/amper) showcases the same project configured with [Amper](https://github.com/JetBrains/amper).
+### Overview
 
-![Screenshots of the app](images/screenshots.png)
+Declare screens using a sealed interface/class
+```kotlin
+@Routes
+sealed interface Screen{
+    @InitialRoute
+    data object ListScreen: Screen
+
+    data class DetailScreen(val objectId: Int): Screen
+
+    data class Settings(val count: Double): Screen
+}
+```
+Build and have:
+```kotlin
+val coroutineScope = rememberCoroutineScope()
+    val controller = rememberController(coroutineScope)
+
+    Destination(
+        controller,
+        onNavigate = {
+            when(it){
+                is Screen.DetailScreen -> DetailScreen(it.objectId)
+                is Screen.ListScreen -> ListScreen()
+                is Screen.Settings -> TODO()
+            }
+        }
+    )
+```
 
 ### Technologies
 
@@ -21,8 +47,7 @@ The app uses the following multiplatform dependencies in its implementation:
 - [Ktor](https://ktor.io/) for networking
 - [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) for JSON handling
 - [Kamel](https://github.com/Kamel-Media/Kamel) for image loading
-- [moko-resources](https://github.com/icerockdev/moko-resources) for string resources
 - [Koin](https://github.com/InsertKoinIO/koin) for dependency injection
-- [Voyager](https://github.com/adrielcafe/voyager) for navigation and screen models
+- [Ballast Nav Ext](https://github.com/Dilivva/BallastNavigationExt) for navigation based on [Ballast](https://github.com/copper-leaf/ballast)
 
-> These are just some of the possible libraries to use for these tasks with Kotlin Multiplatform, and their usage here isn't a strong recommendation for these specific libraries over the available alternatives. You can find a wide variety of curated multiplatform libraries in the [kmp-awesome](https://github.com/terrakok/kmp-awesome) repository.
+> This is experimental and not ready for production
